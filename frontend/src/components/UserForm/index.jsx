@@ -21,7 +21,7 @@ export default function UserForm({ onSuccess, initialValues = {}, isEdit = false
             password: '',
             cpf
          });
-      } 
+      }
       // eslint-disable-next-line
    }, [initialValues, isEdit]);
 
@@ -67,7 +67,16 @@ export default function UserForm({ onSuccess, initialValues = {}, isEdit = false
          <Form.Item name="name" label="Nome" rules={[{ required: true }]}>
             <Input />
          </Form.Item>
-         <Form.Item name="email" label="E-mail">
+         <Form.Item
+            name="email"
+            label="E-mail"
+            rules={[
+               {
+                  type: 'email',
+                  message: 'Digite um e-mail válido',
+               },
+            ]}
+         >
             <Input />
          </Form.Item>
          <Form.Item

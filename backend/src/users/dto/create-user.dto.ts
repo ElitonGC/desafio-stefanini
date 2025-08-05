@@ -6,6 +6,7 @@ import {
   IsDateString,
   Matches,
   MinLength,
+  MaxDate,
 } from 'class-validator';
 
 export class CreateUserDto {
@@ -19,12 +20,13 @@ export class CreateUserDto {
 
   @ApiPropertyOptional()
   @IsOptional()
-  @IsEmail()
+  @IsEmail({}, { message: 'Invalid E-mail format' })
   email?: string;
 
   @ApiProperty()
   @IsNotEmpty()
   @IsDateString()
+  @MaxDate(new Date(), { message: 'Birth date cannot be in the future' })
   birthDate: string;
 
   @ApiPropertyOptional()
