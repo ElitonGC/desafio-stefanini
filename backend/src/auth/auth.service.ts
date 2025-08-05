@@ -25,4 +25,9 @@ export class AuthService {
       access_token: this.jwtService.sign(payload),
     };
   }
+
+  async signup(createUserDto: any) {
+    const user = await this.usersService.create(createUserDto);
+    return this.login(user);
+  }
 }
