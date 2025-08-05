@@ -4,6 +4,7 @@ import React, { useEffect, useState, forwardRef, useImperativeHandle } from 'rea
 import api from '../../api';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
+import formatCPF from '../../utils/formatCPF';
 
 dayjs.extend(utc);
 
@@ -43,7 +44,11 @@ const UserList = forwardRef(({ token, onEdit, onAdd }, ref) => {
 
    const columns = [
       { title: 'Nome', dataIndex: 'name' },
-      { title: 'CPF', dataIndex: 'cpf' },
+      {
+         title: 'CPF',
+         dataIndex: 'cpf',
+         render: (cpf) => formatCPF(cpf),
+      },
       { title: 'E-mail', dataIndex: 'email' },
       {
          title: 'Data de Nascimento',

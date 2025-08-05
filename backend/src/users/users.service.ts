@@ -5,6 +5,7 @@ import { User } from './user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcryptjs';
+import { isValidCPF } from '../utils/validate-cpf';
 
 @Injectable()
 export class UsersService {
@@ -14,6 +15,9 @@ export class UsersService {
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
+    if (!isValidCPF(createUserDto.cpf)) {
+      throw new BadRequestException('CPF inválido');
+    }
     const existing = await this.usersRepository.findOneBy({ cpf: createUserDto.cpf });
     if (existing) {
       throw new BadRequestException('CPF already registered');
@@ -47,6 +51,9 @@ export class UsersService {
   }
 
   async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
+    if (updateUserDto.cpf && !isValidCPF(updateUserDto.cpf)) {
+      throw new BadRequestException('CPF inválido');
+    }
     if (updateUserDto.password) {
       updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10);
     }

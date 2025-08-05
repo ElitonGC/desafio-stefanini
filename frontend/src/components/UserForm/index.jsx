@@ -2,30 +2,38 @@ import { Form, Input, Button, message, DatePicker, Select, Row, Col } from 'antd
 import api from '../../api';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import formatCPF from '../../utils/formatCPF';
 
 dayjs.extend(utc);
 
 export default function UserForm({ onSuccess, initialValues = {}, isEdit = false, token }) {
    const [form] = Form.useForm();
+   const [cpf, setCpf] = useState('');
 
    // Preenche o formulário ao abrir para edição
    useEffect(() => {
       if (isEdit && initialValues) {
+         setCpf(formatCPF(initialValues.cpf || ''));
          form.setFieldsValue({
             ...initialValues,
             birthDate: initialValues.birthDate ? dayjs.utc(initialValues.birthDate) : null,
             password: '',
+            cpf
          });
-      } else {
-         form.resetFields();
-      }
+      } 
       // eslint-disable-next-line
    }, [initialValues, isEdit]);
+
+   // Atualiza o campo do formulário sempre que o CPF mudar
+   useEffect(() => {
+      form.setFieldsValue({ cpf });
+   }, [cpf, form]);
 
    const onFinish = async (values) => {
       try {
          values.birthDate = values.birthDate.format('YYYY-MM-DD');
+         values.cpf = cpf.replace(/\D/g, ''); // Remove máscara antes de enviar
          let res;
          if (isEdit) {
             api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
@@ -53,6 +61,7 @@ export default function UserForm({ onSuccess, initialValues = {}, isEdit = false
          initialValues={{
             ...initialValues,
             birthDate: initialValues.birthDate ? dayjs.utc(initialValues.birthDate) : null,
+            cpf: formatCPF(initialValues.cpf || ''),
          }}
       >
          <Form.Item name="name" label="Nome" rules={[{ required: true }]}>
@@ -61,8 +70,24 @@ export default function UserForm({ onSuccess, initialValues = {}, isEdit = false
          <Form.Item name="email" label="E-mail">
             <Input />
          </Form.Item>
-         <Form.Item name="cpf" label="CPF" rules={[{ required: true }]}>
-            <Input disabled={isEdit} />
+         <Form.Item
+            name="cpf"
+            label="CPF"
+            rules={[
+               { required: true, message: 'CPF é obrigatório' },
+               {
+                  pattern: /^\d{3}\.\d{3}\.\d{3}-\d{2}$/,
+                  message: 'Digite um CPF válido no formato 000.000.000-00',
+               },
+            ]}
+         >
+            <Input
+               disabled={isEdit}
+               value={cpf}
+               onChange={e => setCpf(formatCPF(e.target.value))}
+               maxLength={14}
+               placeholder="000.000.000-00"
+            />
          </Form.Item>
          <Form.Item
             name="password"
