@@ -1,8 +1,10 @@
 import { useState, useRef } from 'react';
 import UserList from '../../components/UserList';
 import UserForm from '../../components/UserForm';
-import { Modal } from 'antd';
+import { Modal, Layout } from 'antd';
 import { PoweroffOutlined } from '@ant-design/icons';
+
+const { Header, Content } = Layout;
 
 export default function UsersPage({ token, onLogout }) {
    const [editingUser, setEditingUser] = useState(null);
@@ -32,9 +34,18 @@ export default function UsersPage({ token, onLogout }) {
    };
 
    return (
-      <div style={{ maxWidth: 1200, margin: 'auto', marginTop: 50 }}>
-         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <h2>Usuários</h2>
+      <Layout style={{ minHeight: '100vh', background: '#f0f2f5' }}>
+         <Header
+            style={{
+               background: '#fff',
+               display: 'flex',
+               justifyContent: 'space-between',
+               alignItems: 'center',
+               boxShadow: '0 2px 8px #f0f1f2',
+               padding: '0 32px',
+            }}
+         >
+            <h2 style={{ margin: 0 }}>Usuários</h2>
             <button
                onClick={onLogout}
                style={{
@@ -53,36 +64,38 @@ export default function UsersPage({ token, onLogout }) {
             >
                <PoweroffOutlined />
             </button>
-         </div>
-         <UserList ref={userListRef} token={token} onEdit={handleEdit} onAdd={handleAdd} />
-         <Modal
-            open={modalVisible}
-            onCancel={handleCloseModal}
-            footer={null}
-            destroyOnClose
-            title={editingUser ? "Editar Usuário" : "Novo Usuário"}
-         >
-            {editingUser && (
-               <UserForm
-                  initialValues={editingUser}
-                  onSuccess={() => {
-                     handleCloseModal();
-                     refreshUsers();
-                  }}
-                  isEdit
-                  token={token}
-               />
-            )}
-            {!editingUser && (
-               <UserForm
-                  onSuccess={() => {
-                     handleCloseModal();
-                     refreshUsers();
-                  }}
-                  token={token}
-               />
-            )}
-         </Modal>
-      </div>
+         </Header>
+         <Content style={{ maxWidth: 1200, margin: '40px auto', width: '100%' }}>
+            <UserList ref={userListRef} token={token} onEdit={handleEdit} onAdd={handleAdd} />
+            <Modal
+               open={modalVisible}
+               onCancel={handleCloseModal}
+               footer={null}
+               destroyOnClose
+               title={editingUser ? "Editar Usuário" : "Novo Usuário"}
+            >
+               {editingUser && (
+                  <UserForm
+                     initialValues={editingUser}
+                     onSuccess={() => {
+                        handleCloseModal();
+                        refreshUsers();
+                     }}
+                     isEdit
+                     token={token}
+                  />
+               )}
+               {!editingUser && (
+                  <UserForm
+                     onSuccess={() => {
+                        handleCloseModal();
+                        refreshUsers();
+                     }}
+                     token={token}
+                  />
+               )}
+            </Modal>
+         </Content>
+      </Layout>
    );
 }
