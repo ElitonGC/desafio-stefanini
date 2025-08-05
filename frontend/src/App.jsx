@@ -1,35 +1,30 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import LoginPage from './pages/Login';
+import RegisterPage from './pages/Register';
+import UsersPage from './pages/Users';
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+   const [token, setToken] = useState(localStorage.getItem('token') || '');
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+   const handleSetToken = (t) => {
+      setToken(t);
+      localStorage.setItem('token', t);
+   };
+
+   const handleLogout = () => {
+      setToken('');
+      localStorage.removeItem('token');
+   };
+
+   return (
+      <BrowserRouter>
+         <Routes>
+            <Route path="/login" element={<LoginPage setToken={handleSetToken} />} />
+            <Route path="/register" element={<RegisterPage setToken={handleSetToken}/>} />
+            <Route path="/users" element={token ? <UsersPage token={token} onLogout={handleLogout} /> : <Navigate to="/login" />} />
+            <Route path="*" element={<Navigate to="/login" />} />
+         </Routes>
+      </BrowserRouter>
+   );
 }
-
-export default App
